@@ -88,15 +88,19 @@ body {
 .brand-icon {
   width: 34px;
   height: 34px;
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 900;
-  color: #000;
-  font-family: var(--font-mono);
+  border-radius: 6px;
+  overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+}
+
+.brand-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .brand-text h1 {
@@ -620,4 +624,449 @@ tbody tr:hover {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+/*RESPONSIVE DESIGN DAVIS - Desktop → Laptop → Tablet → Mobile */
+
+
+/* LAPTOP 992px - 1199px */
+
+@media (max-width: 1199px) {
+
+  .sidebar {
+    width: 200px;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
+/* TABLET 768px - 991px */
+
+@media (max-width: 991px) {
+
+  .app-header {
+    padding: 0 16px;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .brand-text p {
+    font-size: 9px;
+  }
+
+  .sidebar {
+    width: 70px;
+  }
+
+  .nav-menu {
+    padding: 12px 6px;
+  }
+
+  .nav-item {
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .nav-item span {
+    display: none;
+  }
+
+  .sidebar-footer {
+    display: none;
+  }
+
+  .main-content {
+    padding: 16px;
+  }
+
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  #cy {
+    height: 550px;
+    min-height: 550px;
+  }
+
+  .page-header {
+    gap: 12px;
+  }
+
+}
+
+
+/* MOBILE 481px - 767px */
+
+@media (max-width: 767px) {
+
+  .app-header {
+    height: 58px;
+    padding: 0 12px;
+  }
+
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .brand-text h1 {
+    font-size: 16px;
+  }
+
+  .brand-text p {
+    display: none;
+  }
+
+  .sidebar {
+    width: 56px;
+  }
+
+  .nav-menu {
+    padding: 10px 4px;
+  }
+
+  .nav-item {
+    padding: 10px 6px;
+  }
+
+  .main-content {
+    padding: 12px;
+  }
+
+  .grid-cols-4,
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 600px;
+  }
+
+  #cy {
+    height: 450px;
+    min-height: 450px;
+  }
+
+  .btn {
+    padding: 8px 12px;
+  }
+
+}
+
+/* SMALL MOBILE ≤ 480px */
+
+@media (max-width: 480px) {
+
+  .app-header {
+    height: 54px;
+    padding: 0 10px;
+  }
+
+  .brand-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .brand-text h1 {
+    font-size: 15px;
+  }
+
+  .case-selector {
+    display: none;
+  }
+
+  .sidebar {
+    width: 52px;
+  }
+
+  .nav-item {
+    padding: 9px 4px;
+  }
+
+  .main-content {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 10px;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  .page-title h2 {
+    font-size: 18px;
+  }
+
+  #cy {
+    height: 380px;
+    min-height: 380px;
+  }
+
+  .modal {
+    width: 95vw;
+    max-width: 95vw;
+  }
+
+  .modal-body {
+    padding: 14px;
+  }
+
+  .modal-footer {
+    padding: 12px 14px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+}
+
+/* =========================================================
+   RESPONSIVE SIDEBAR + HOVER TOOLTIP
+   ========================================================= */
+
+/* -------------------------
+   LAPTOP / TABLET
+   ------------------------- */
+
+@media (max-width: 991px) {
+
+  /* Make sidebar narrow */
+  .sidebar {
+    width: 70px;
+    min-width: 70px;
+  }
+
+  /* Center the navigation icons */
+  .nav-menu {
+    padding: 12px 8px;
+  }
+
+  .nav-item {
+    position: relative;
+    width: 54px;
+    height: 46px;
+    padding: 10px;
+    justify-content: center;
+    gap: 0;
+  }
+
+  /* Hide the text but keep the SVG icon */
+  .nav-item {
+    font-size: 0;
+  }
+
+  .nav-item svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  /* Tooltip */
+  .nav-item::after {
+    content: attr(data-tooltip);
+
+    position: fixed;
+
+    left: 78px;
+    transform: translateY(-50%);
+
+    background: #1a2234;
+    color: #f0f6fc;
+
+    border: 1px solid #24324d;
+    border-radius: 6px;
+
+    padding: 8px 12px;
+
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+
+    opacity: 0;
+    visibility: hidden;
+
+    pointer-events: none;
+
+    z-index: 99999;
+
+    transition: opacity 0.15s ease;
+  }
+
+  .nav-item:hover::after {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Sidebar footer becomes hidden */
+  .sidebar-footer {
+    display: none;
+  }
+
+  /* Main content */
+  .main-content {
+    padding: 18px;
+  }
+
+  /* Two columns become one */
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Four columns become two */
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #cy {
+    height: 550px;
+    min-height: 550px;
+  }
+}
+
+
+/* -------------------------
+   MOBILE
+   ------------------------- */
+
+@media (max-width: 767px) {
+
+  .sidebar {
+    width: 58px;
+    min-width: 58px;
+  }
+
+  .nav-menu {
+    padding: 10px 4px;
+  }
+
+  .nav-item {
+    width: 50px;
+    height: 44px;
+    padding: 9px;
+  }
+
+  .nav-item::after {
+    left: 66px;
+  }
+
+  .main-content {
+    padding: 14px;
+  }
+
+  .grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  #cy {
+    height: 450px;
+    min-height: 450px;
+  }
+
+  .app-header {
+    padding: 0 12px;
+  }
+
+  .brand-text p {
+    display: none;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .header-actions .badge {
+    display: none;
+  }
+
+  .case-selector {
+    padding: 5px 8px;
+  }
+
+  .btn {
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+}
+
+
+/* -------------------------
+   VERY SMALL MOBILE
+   ------------------------- */
+
+@media (max-width: 480px) {
+
+  .sidebar {
+    width: 52px;
+    min-width: 52px;
+  }
+
+  .nav-item {
+    width: 44px;
+    height: 42px;
+  }
+
+  .nav-item::after {
+    left: 60px;
+  }
+
+  .main-content {
+    padding: 10px;
+  }
+
+  .page-title h2 {
+    font-size: 17px;
+  }
+
+  .page-title p {
+    font-size: 11px;
+  }
+
+  #cy {
+    height: 380px;
+    min-height: 380px;
+  }
 }
