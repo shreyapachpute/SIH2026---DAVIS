@@ -18,14 +18,28 @@ const API = {
     return res.json();
   },
 
-  async createCase(caseData) {
-    const res = await fetch(`${API_BASE}/cases`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(caseData)
-    });
-    return res.json();
-  },
+async createCase(caseData) {
+  const res = await fetch(`${API_BASE}/cases`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(caseData)
+  });
+
+  if (!res.ok) {
+    let message = `Failed to create case (HTTP ${res.status})`;
+
+    try {
+      const errorData = await res.json();
+      message = errorData.message || errorData.error || message;
+    } catch (_) {
+      // Keep default message if response is not JSON
+    }
+
+    throw new Error(message);
+  }
+
+  return res.json();
+},
 
   async loadDemoCase() {
     const res = await fetch(`${API_BASE}/cases/demo`, { method: 'POST' });

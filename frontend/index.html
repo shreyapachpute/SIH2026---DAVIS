@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DAVIS — Digital Attribution & Verification Intelligence System | SIH 2026</title>
-  
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  
+
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 
@@ -24,8 +24,8 @@
   <header class="app-header">
     <div class="brand">
       <div class="brand-icon">
-      <img src="assets/davis-logo.png" alt="DAVIS Logo">
-    </div>
+        <img src="assets/davis-logo.png" alt="DAVIS Logo">
+      </div>
 
       <div class="brand-text">
         <h1>DAVIS</h1>
@@ -39,9 +39,14 @@
         <select id="caseSelect"></select>
       </div>
 
+      <button id="btnCreateCase" class="btn btn-outline">
+        <span style="font-size:16px; line-height:1;">+</span>
+        Create Case
+      </button>
+
       <button id="btnLoadDemo" class="btn btn-cyan">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
+          <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
         </svg>
         Load Demo Case
       </button>
@@ -90,7 +95,7 @@
             data-tooltip="Relationship Graph">
 
           <svg viewBox="0 0 24 24">
-            <path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.991.991 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88v9z"/>
+            <path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.991.991 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s-.41-.06-.57-.18l7.9 4.44c.32.17.53.5.53.88v9z"/>
           </svg>
 
           <span>Relationship Graph</span>
@@ -1381,7 +1386,8 @@
                   id="reviewComments"
                   rows="4"
                   class="form-control"
-                  placeholder="Provide detailed reasoning regarding corroborating and contradictory evidence...">Strong cryptographic and financial correlation observed. However, temporal contradiction between NF_27 and NightFalcon live sessions suggests secondary operative or proxy operator. Recommend pivoting to subkey issuer CypherSentinel before concluding attribution lead.</textarea>
+                  placeholder="Provide detailed reasoning regarding corroborating and contradictory evidence..."
+                >Strong cryptographic and financial correlation observed. However, temporal contradiction between NF_27 and NightFalcon live sessions suggests secondary operative or proxy operator. Recommend pivoting to subkey issuer CypherSentinel before concluding attribution lead.</textarea>
 
               </div>
 
@@ -1507,7 +1513,42 @@
 
 
         <div class="grid-cols-4">
+                    <div
+            class="card"
+            style="text-align:center;">
 
+            <h3
+              style="
+                font-size:14px;
+                margin-bottom:10px;
+              ">
+
+              Integrity Certificate PDF
+
+            </h3>
+
+            <p
+              style="
+                font-size:12px;
+                color:var(--text-muted);
+                margin-bottom:14px;
+              ">
+
+              Formal electronic evidence chain-of-custody certificate
+              with SHA-256 seal.
+
+            </p>
+
+            <button
+              id="btnExportCert"
+              class="btn btn-cyan"
+              style="width:100%;">
+
+              Download Certificate
+
+            </button>
+
+          </div>
           <div
             class="card"
             style="text-align:center;">
@@ -1556,44 +1597,6 @@
                 margin-bottom:10px;
               ">
 
-              Integrity Certificate PDF
-
-            </h3>
-
-            <p
-              style="
-                font-size:12px;
-                color:var(--text-muted);
-                margin-bottom:14px;
-              ">
-
-              Formal electronic evidence chain-of-custody certificate
-              with SHA-256 seal.
-
-            </p>
-
-            <button
-              id="btnExportCert"
-              class="btn btn-cyan"
-              style="width:100%;">
-
-              Download Certificate
-
-            </button>
-
-          </div>
-
-
-          <div
-            class="card"
-            style="text-align:center;">
-
-            <h3
-              style="
-                font-size:14px;
-                margin-bottom:10px;
-              ">
-
               CSV Matrix Export
 
             </h3>
@@ -1612,7 +1615,7 @@
 
             <button
               id="btnExportCsv"
-              class="btn btn-outline"
+              class="btn btn-primary"
               style="width:100%;">
 
               Download CSV
@@ -1649,7 +1652,7 @@
 
             <button
               id="btnExportJson"
-              class="btn btn-outline"
+              class="btn btn-primary"
               style="width:100%;">
 
               Download JSON
@@ -1712,8 +1715,7 @@
                 rows="3"
                 class="form-control mono"
                 placeholder="Enter content to verify..."
-                required>
-              </textarea>
+                required></textarea>
 
             </div>
 
@@ -1826,6 +1828,146 @@
   </div>
 
 
+  <!-- Create Case Modal -->
+  <div id="createCaseModal" class="modal-overlay">
+
+    <div class="modal">
+
+      <div class="modal-header">
+
+        <h3>Create New Case</h3>
+
+        <button
+          type="button"
+          id="btnCloseCreateCase"
+          class="modal-close"
+          aria-label="Close">
+          ×
+        </button>
+
+      </div>
+
+
+      <form id="formCreateCase">
+
+        <div class="modal-body">
+
+          <div class="form-group">
+
+            <label for="newCaseNumber">
+              Case Number
+            </label>
+
+            <input
+              type="text"
+              id="newCaseNumber"
+              class="form-control"
+              placeholder="DAVIS-CASE-002"
+            >
+
+            <small class="form-hint">
+              Leave blank to generate a case number automatically.
+            </small>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="newCaseTitle">
+              Case Title
+            </label>
+
+            <input
+              type="text"
+              id="newCaseTitle"
+              class="form-control"
+              placeholder="Enter investigation title"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="newCaseDescription">
+              Description
+            </label>
+
+            <textarea
+              id="newCaseDescription"
+              class="form-control"
+              rows="4"
+              placeholder="Describe the purpose and scope of this investigation..."
+            ></textarea>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="newCaseStatus">
+              Status
+            </label>
+
+            <select
+              id="newCaseStatus"
+              class="form-control">
+
+              <option value="ACTIVE" selected>
+                ACTIVE
+              </option>
+
+              <option value="OPEN">
+                OPEN
+              </option>
+
+              <option value="UNDER_REVIEW">
+                UNDER REVIEW
+              </option>
+
+              <option value="CLOSED">
+                CLOSED
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+          <button
+            type="button"
+            id="btnCancelCreateCase"
+            class="btn btn-outline">
+
+            Cancel
+
+          </button>
+
+
+          <button
+            type="submit"
+            id="btnSubmitCreateCase"
+            class="btn btn-cyan">
+
+            Create Case
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
   <!-- Scripts -->
   <script src="js/api.js"></script>
   <script src="js/graph.js"></script>
@@ -1833,15 +1975,12 @@
   <script src="js/app.js"></script>
 
   <script>
-/* Automatically create tooltip names for sidebar items */
-document.querySelectorAll('.nav-item').forEach(function(item) {
-
-    const text = item.textContent.trim();
-
-    item.setAttribute('data-tooltip', text);
-
-});
-</script>
+    /* Automatically create tooltip names for sidebar items */
+    document.querySelectorAll('.nav-item').forEach(function(item) {
+      const text = item.textContent.trim();
+      item.setAttribute('data-tooltip', text);
+    });
+  </script>
 
 </body>
 </html>
