@@ -43,9 +43,12 @@ public class AnalysisController {
     }
 
     @GetMapping("/analysis")
-    public ResponseEntity<AnalysisScoreResponse> getAnalysis(@PathVariable Long caseId) {
-        return ResponseEntity.ok(analysisService.getLatestAnalysis(caseId));
-    }
+public ResponseEntity<AnalysisScoreResponse> getAnalysis(@PathVariable Long caseId) {
+
+    return analysisService.getLatestAnalysis(caseId)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.noContent().build());
+}
 
     @PostMapping("/stress-test")
     public ResponseEntity<StressTestResponse> runStressTest(@PathVariable Long caseId,

@@ -130,7 +130,52 @@ public class AnalysisService {
         return response;
     }
 
-    public AnalysisScoreResponse getLatestAnalysis(Long caseId) {
-        return runAnalysis(caseId);
+    public Optional<AnalysisScoreResponse> getLatestAnalysis(Long caseId) {
+
+    caseRepository.findById(caseId)
+            .orElseThrow(() ->
+                    new IllegalArgumentException("Case not found: " + caseId)
+            );
+
+    Optional<AnalysisResult> latest =
+            analysisResultRepository.findFirstByCaseIdOrderByCreatedAtDesc(caseId);
+
+    if (latest.isEmpty()) {
+        return Optional.empty();
     }
+
+    AnalysisResult result = latest.get();
+
+    AnalysisScoreResponse response = new AnalysisScoreResponse();
+
+    response.setTotalScore(result.getScore());
+    response.setConfidence(result.getConfidence());
+    response.setMethodology(result.getMethodology());
+
+    /*
+     * Restore the saved scoring breakdown.
+     * The actual attribution calculation is NOT performed here.
+     */
+    if (result.getBreakdownJson() != null
+            && !result.getBreakdownJson().isBlank()) {
+
+        try {
+            Map<String, Double> breakdown =
+                    objectMapper.readValue(
+                            result.getBreakdownJson(),
+                            Map.class
+                    );
+
+            response.setBreakdown(breakdown);
+
+        } catch (Exception e) {
+            response.setBreakdown(new LinkedHashMap<>());
+        }
+
+    } else {
+        response.setBreakdown(new LinkedHashMap<>());
+    }
+
+    return Optional.of(response);
+}
 }

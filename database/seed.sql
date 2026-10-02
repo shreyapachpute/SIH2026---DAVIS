@@ -11,36 +11,14 @@ INSERT INTO cases (id, case_number, title, description, status, created_at, upda
  'ACTIVE', '2026-08-01 09:00:00', '2026-08-12 16:30:00');
 
 -- 2. Indicators
--- normalized_value is used to prevent duplicate indicators
--- within the same case while preserving the original 'value'.
-INSERT INTO indicators
-    (id, case_id, type, value, normalized_value, source, confidence, created_at)
-VALUES 
-(1, 1, 'USERNAME', 'NightFalcon', 'nightfalcon',
- 'Darknet Market Extortion Post #8419', 0.95, '2026-08-01 09:30:00'),
+INSERT INTO indicators (id, case_id, type, value, source, confidence, created_at) VALUES 
+(1, 1, 'USERNAME', 'NightFalcon', 'Darknet Market Extortion Post #8419', 0.95, '2026-08-01 09:30:00'),
+(2, 1, 'EMAIL', 'nightfalcon.demo@example.invalid', 'Encrypted paste leak metadata', 0.88, '2026-08-02 11:15:00'),
+(3, 1, 'PGP_KEY', '7F9A 4B2C 8E1D 0F3A 5C6B 9D2E 1A4F 3B8C 7E0D 2F1A', 'Keyserver HKP query (synthetic)', 0.92, '2026-08-03 14:00:00'),
+(4, 1, 'CRYPTO_WALLET', 'bc1q9davisdemo7falcon9synthetic3trans001', 'Ransom negotiation note leak', 0.96, '2026-08-05 10:20:00'),
+(5, 1, 'DOMAIN', 'falcon-ops.example.invalid', 'WHOIS historical certificate telemetry', 0.82, '2026-08-06 17:45:00'),
+(6, 1, 'ONION_ADDRESS', 'falconsec7synthx3darkdemo.onion', 'Tor directory index crawl', 0.90, '2026-08-07 13:10:00');
 
-(2, 1, 'EMAIL', 'nightfalcon.demo@example.invalid', 'nightfalcon.demo@example.invalid',
- 'Encrypted paste leak metadata', 0.88, '2026-08-02 11:15:00'),
-
-(3, 1, 'PGP_KEY',
- '7F9A 4B2C 8E1D 0F3A 5C6B 9D2E 1A4F 3B8C 7E0D 2F1A',
- '7f9a 4b2c 8e1d 0f3a 5c6b 9d2e 1a4f 3b8c 7e0d 2f1a',
- 'Keyserver HKP query (synthetic)', 0.92, '2026-08-03 14:00:00'),
-
-(4, 1, 'CRYPTO_WALLET',
- 'bc1q9davisdemo7falcon9synthetic3trans001',
- 'bc1q9davisdemo7falcon9synthetic3trans001',
- 'Ransom negotiation note leak', 0.96, '2026-08-05 10:20:00'),
-
-(5, 1, 'DOMAIN',
- 'falcon-ops.example.invalid',
- 'falcon-ops.example.invalid',
- 'WHOIS historical certificate telemetry', 0.82, '2026-08-06 17:45:00'),
-
-(6, 1, 'ONION_ADDRESS',
- 'falconsec7synthx3darkdemo.onion',
- 'falconsec7synthx3darkdemo.onion',
- 'Tor directory index crawl', 0.90, '2026-08-07 13:10:00');
 -- 3. Discovered Entities
 INSERT INTO entities (id, case_id, type, name, normalized_value, confidence) VALUES 
 (1, 1, 'PERSONA', 'NightFalcon Primary', 'persona:nightfalcon', 0.95),

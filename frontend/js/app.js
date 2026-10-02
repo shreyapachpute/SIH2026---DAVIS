@@ -711,6 +711,11 @@ function initEventListeners() {
             );
 
 
+          if (!resultEl) {
+            return;
+          }
+
+
           if (res.match) {
 
             resultEl.innerHTML =
@@ -1019,30 +1024,60 @@ async function loadDashboardMetrics() {
       document.getElementById('m-score-card');
 
 
+    /*
+     * Always reset the score before checking
+     * the currently selected case.
+     *
+     * This is important when switching from
+     * an analyzed case to a fresh case.
+     */
+    if (scoreEl) {
+      scoreEl.textContent = 'N/A';
+    }
+
+    if (scoreCard) {
+      scoreCard.style.borderColor = '';
+    }
+
+
     try {
 
       const analysis =
         await API.getAnalysis(currentCaseId);
 
 
+      /*
+       * A fresh case has no analysis yet.
+       *
+       * API.getAnalysis() returns null when
+       * backend responds with HTTP 204.
+       */
       if (
         analysis &&
         analysis.totalScore !== undefined &&
         analysis.totalScore !== null
       ) {
 
-        scoreEl.textContent =
-          `${analysis.totalScore.toFixed(1)}/100`;
+        const numericScore =
+          Number(analysis.totalScore);
+
+
+        if (scoreEl) {
+
+          scoreEl.textContent =
+            `${numericScore.toFixed(1)}/100`;
+
+        }
 
 
         if (scoreCard) {
 
-          if (analysis.totalScore >= 70) {
+          if (numericScore >= 70) {
 
             scoreCard.style.borderColor =
               'rgba(0, 230, 118, 0.4)';
 
-          } else if (analysis.totalScore >= 45) {
+          } else if (numericScore >= 45) {
 
             scoreCard.style.borderColor =
               'rgba(255, 179, 0, 0.4)';
@@ -1058,39 +1093,46 @@ async function loadDashboardMetrics() {
 
       } else {
 
-        scoreEl.textContent = 'N/A';
+        /*
+         * No saved analysis.
+         * Keep dashboard explicitly at N/A.
+         */
+        if (scoreEl) {
+          scoreEl.textContent = 'N/A';
+        }
+
+        if (scoreCard) {
+          scoreCard.style.borderColor = '';
+        }
 
       }
 
     } catch (analysisError) {
 
       /*
-       * This is normal for a newly-created case.
-       * Analysis only exists after investigation/analysis
-       * has been executed.
+       * Analysis lookup failing should not
+       * break the entire dashboard.
        */
+      console.warn(
+        'Dashboard analysis load notice:',
+        analysisError.message
+      );
 
       if (scoreEl) {
         scoreEl.textContent = 'N/A';
       }
 
       if (scoreCard) {
-        scoreCard.style.borderColor =
-          'var(--border-color)';
+        scoreCard.style.borderColor = '';
       }
-
-      console.info(
-        'No analysis available yet for case:',
-        currentCaseId
-      );
 
     }
 
   } catch (err) {
 
-    console.warn(
-      'Dashboard metrics load notice:',
-      err.message
+    console.error(
+      'Failed to load dashboard metrics:',
+      err
     );
 
   }
@@ -1262,11 +1304,20 @@ async function runInvestigationPipeline() {
 
   try {
 
+    /*
+     * Collection creates the controlled
+     * synthetic intelligence network.
+     */
     const result =
       await API.runCollection(
         currentCaseId
       );
 
+
+    /*
+     * Analysis is deliberately executed
+     * ONLY here after explicit user action.
+     */
     const analysis =
       await API.runAnalysis(
         currentCaseId
@@ -1372,6 +1423,17 @@ async function loadEvidence() {
     tbody.innerHTML = '';
 
 
+    if (evidenceList.length === 0) {
+
+      tbody.innerHTML =
+        '<tr><td colspan="6" class="text-muted">' +
+        'No evidence available for this case yet.' +
+        '</td></tr>';
+
+      return;
+    }
+
+
     evidenceList.forEach(ev => {
 
       const tr =
@@ -1426,7 +1488,7 @@ async function loadEvidence() {
           class="mono"
           title="${ev.hash}"
         >
-          ${ev.hash.substring(0, 16)}...
+          ${ev.hash ? ev.hash.substring(0, 16) + '...' : 'N/A'}
         </td>
       `;
 
@@ -1460,20 +1522,53 @@ async function loadAnalysis() {
       );
 
 
-    /* Score */
+    /*
+     * Fresh case / no analysis yet.
+     *
+     * API.getAnalysis() returns null when
+     * backend responds with HTTP 204.
+     */
+    if (!analysis) {
+
+      resetAnalysisView();
+
+      return;
+    }
+
+
+    /* -----------------------------------------------------
+       Score
+       ----------------------------------------------------- */
 
     const scoreVal =
       document.getElementById(
         'analysisScoreVal'
       );
 
+    const totalScore =
+      Number(analysis.totalScore);
+
+
     if (scoreVal) {
 
-      scoreVal.textContent =
-        `${analysis.totalScore.toFixed(1)}/100`;
+      if (Number.isFinite(totalScore)) {
+
+        scoreVal.textContent =
+          `${totalScore.toFixed(1)}/100`;
+
+      } else {
+
+        scoreVal.textContent =
+          'N/A';
+
+      }
 
     }
 
+
+    /* -----------------------------------------------------
+       Score Meter
+       ----------------------------------------------------- */
 
     const scoreMeter =
       document.getElementById(
@@ -1482,28 +1577,52 @@ async function loadAnalysis() {
 
     if (scoreMeter) {
 
+      const meterValue =
+        Number.isFinite(totalScore)
+          ? Math.max(0, Math.min(100, totalScore))
+          : 0;
+
       scoreMeter.style.width =
-        `${analysis.totalScore}%`;
+        `${meterValue}%`;
 
     }
 
 
-    /* Radar chart */
+    /* -----------------------------------------------------
+       Radar Chart / Breakdown
+       ----------------------------------------------------- */
 
-    if (analysis.breakdown) {
+    if (
+      analysis.breakdown &&
+      typeof analysis.breakdown === 'object'
+    ) {
 
-      ChartsController.renderAttributionRadar(
-        analysis.breakdown
-      );
+      if (
+        typeof ChartsController !== 'undefined' &&
+        ChartsController.renderAttributionRadar
+      ) {
+
+        ChartsController.renderAttributionRadar(
+          analysis.breakdown
+        );
+
+      }
+
 
       renderBreakdownTable(
         analysis.breakdown
       );
 
+    } else {
+
+      clearBreakdownView();
+
     }
 
 
-    /* Explanation */
+    /* -----------------------------------------------------
+       Explanation
+       ----------------------------------------------------- */
 
     const analysisExplanation =
       document.getElementById(
@@ -1513,10 +1632,15 @@ async function loadAnalysis() {
     if (analysisExplanation) {
 
       analysisExplanation.textContent =
-        analysis.explanation || 'N/A';
+        analysis.explanation ||
+        'Analysis completed. Detailed explanation is not available in the stored result.';
 
     }
 
+
+    /* -----------------------------------------------------
+       Primary Dependency
+       ----------------------------------------------------- */
 
     const primaryDependency =
       document.getElementById(
@@ -1531,7 +1655,9 @@ async function loadAnalysis() {
     }
 
 
-    /* Stylometry */
+    /* -----------------------------------------------------
+       Stylometry
+       ----------------------------------------------------- */
 
     if (analysis.stylometricAnalysis) {
 
@@ -1591,10 +1717,16 @@ async function loadAnalysis() {
 
       }
 
+    } else {
+
+      resetStylometryView();
+
     }
 
 
-    /* Evidence */
+    /* -----------------------------------------------------
+       Evidence
+       ----------------------------------------------------- */
 
     renderEvidenceClaimList(
       'supportingClaimsList',
@@ -1615,6 +1747,159 @@ async function loadAnalysis() {
       'Failed to load analysis:',
       err
     );
+
+    /*
+     * Do not leave stale analysis visible
+     * if the request fails.
+     */
+    resetAnalysisView();
+
+  }
+
+}
+
+
+/* =========================================================
+   ANALYSIS RESET
+   ========================================================= */
+
+function resetAnalysisView() {
+
+  /* Score */
+
+  const scoreVal =
+    document.getElementById(
+      'analysisScoreVal'
+    );
+
+  if (scoreVal) {
+    scoreVal.textContent = 'N/A';
+  }
+
+
+  /* Meter */
+
+  const scoreMeter =
+    document.getElementById(
+      'scoreMeter'
+    );
+
+  if (scoreMeter) {
+    scoreMeter.style.width = '0%';
+  }
+
+
+  /* Explanation */
+
+  const analysisExplanation =
+    document.getElementById(
+      'analysisExplanation'
+    );
+
+  if (analysisExplanation) {
+
+    analysisExplanation.textContent =
+      'No attribution analysis has been executed for this case yet. Run the Controlled Investigation to calculate the attribution score.';
+
+  }
+
+
+  /* Primary dependency */
+
+  const primaryDependency =
+    document.getElementById(
+      'primaryDependency'
+    );
+
+  if (primaryDependency) {
+    primaryDependency.textContent = 'N/A';
+  }
+
+
+  /* Breakdown */
+
+  clearBreakdownView();
+
+
+  /* Evidence lists */
+
+  renderEvidenceClaimList(
+    'supportingClaimsList',
+    [],
+    'badge-green'
+  );
+
+  renderEvidenceClaimList(
+    'contradictoryClaimsList',
+    [],
+    'badge-red'
+  );
+
+
+  /* Stylometry */
+
+  resetStylometryView();
+
+}
+
+
+function clearBreakdownView() {
+
+  const tbody =
+    document.getElementById(
+      'breakdownTableBody'
+    );
+
+  if (tbody) {
+
+    tbody.innerHTML =
+      `<tr>
+        <td colspan="3" class="text-muted">
+          No attribution analysis available yet.
+        </td>
+      </tr>`;
+
+  }
+
+}
+
+
+function resetStylometryView() {
+
+  const stySimPercent =
+    document.getElementById(
+      'stySimPercent'
+    );
+
+  if (stySimPercent) {
+    stySimPercent.textContent = 'N/A';
+  }
+
+
+  const aiBadge =
+    document.getElementById(
+      'styAiBadge'
+    );
+
+  if (aiBadge) {
+
+    aiBadge.innerHTML =
+      '<span class="badge badge-amber">' +
+      'ANALYSIS NOT RUN' +
+      '</span>';
+
+  }
+
+
+  const styAiExpl =
+    document.getElementById(
+      'styAiExpl'
+    );
+
+  if (styAiExpl) {
+
+    styAiExpl.textContent =
+      'Stylometric analysis will appear after the controlled investigation is executed.';
 
   }
 
@@ -1641,43 +1926,43 @@ function renderBreakdownTable(breakdown) {
 
     {
       dim: 'Cryptographic (PGP Key)',
-      val: breakdown.cryptographicContribution,
+      val: Number(breakdown.cryptographicContribution ?? 0),
       role: 'Primary Anchor (+)'
     },
 
     {
       dim: 'Financial (Blockchain / Wallet)',
-      val: breakdown.financialContribution,
+      val: Number(breakdown.financialContribution ?? 0),
       role: 'Forensic Transfer (+)'
     },
 
     {
       dim: 'Infrastructure (Domain & Onion)',
-      val: breakdown.infrastructureContribution,
+      val: Number(breakdown.infrastructureContribution ?? 0),
       role: 'Network Telemetry (+)'
     },
 
     {
       dim: 'Alias / Persona Correlation',
-      val: breakdown.aliasContribution,
+      val: Number(breakdown.aliasContribution ?? 0),
       role: 'Identity Normalization (+)'
     },
 
     {
       dim: 'Stylometric Linguistic Match',
-      val: breakdown.stylometricContribution,
+      val: Number(breakdown.stylometricContribution ?? 0),
       role: 'Syntax / Lexicon (+)'
     },
 
     {
       dim: 'Temporal Overlap (Operating Window)',
-      val: breakdown.temporalContribution,
+      val: Number(breakdown.temporalContribution ?? 0),
       role: 'Activity Hours (+)'
     },
 
     {
       dim: 'Contradiction Deductions (Conflict Penalties)',
-      val: breakdown.contradictionDeduction,
+      val: Number(breakdown.contradictionDeduction ?? 0),
       role: 'Contradiction Penalty (-)'
     }
 
@@ -1797,7 +2082,7 @@ function renderEvidenceClaimList(
       ">
 
         <span class="badge ${badgeClass}">
-          ${it.type}
+          ${it.type || 'EVIDENCE'}
         </span>
 
         <span
@@ -1816,7 +2101,7 @@ function renderEvidenceClaimList(
         font-size:12px;
         margin-bottom:2px;
       ">
-        ${it.content}
+        ${it.content || ''}
       </p>
 
       <p style="
@@ -1867,22 +2152,54 @@ async function runStressTest(dependency) {
       );
 
 
-    document.getElementById(
-      'stressOriginalScore'
-    ).textContent =
-      `${res.originalScore.toFixed(1)}/100`;
+    const originalScore =
+      Number(res.originalScore);
+
+    const modifiedScore =
+      Number(res.modifiedScore);
+
+    const scoreDelta =
+      Number(res.scoreDelta);
 
 
-    document.getElementById(
-      'stressModifiedScore'
-    ).textContent =
-      `${res.modifiedScore.toFixed(1)}/100`;
+    const originalEl =
+      document.getElementById(
+        'stressOriginalScore'
+      );
+
+    const modifiedEl =
+      document.getElementById(
+        'stressModifiedScore'
+      );
+
+    const deltaEl =
+      document.getElementById(
+        'stressDelta'
+      );
 
 
-    document.getElementById(
-      'stressDelta'
-    ).textContent =
-      `${res.scoreDelta.toFixed(1)}`;
+    if (originalEl) {
+
+      originalEl.textContent =
+        `${originalScore.toFixed(1)}/100`;
+
+    }
+
+
+    if (modifiedEl) {
+
+      modifiedEl.textContent =
+        `${modifiedScore.toFixed(1)}/100`;
+
+    }
+
+
+    if (deltaEl) {
+
+      deltaEl.textContent =
+        `${scoreDelta.toFixed(1)}`;
+
+    }
 
 
     const robustBadge =
@@ -1923,22 +2240,43 @@ async function runStressTest(dependency) {
     }
 
 
-    document.getElementById(
-      'stressExplanation'
-    ).textContent =
-      res.explanation;
+    const stressExplanation =
+      document.getElementById(
+        'stressExplanation'
+      );
+
+    if (stressExplanation) {
+
+      stressExplanation.textContent =
+        res.explanation || 'N/A';
+
+    }
 
 
-    document.getElementById(
-      'stressRecommendation'
-    ).textContent =
-      res.pivotRecommendation;
+    const stressRecommendation =
+      document.getElementById(
+        'stressRecommendation'
+      );
+
+    if (stressRecommendation) {
+
+      stressRecommendation.textContent =
+        res.pivotRecommendation || 'N/A';
+
+    }
 
 
-    document.getElementById(
-      'stressResultCard'
-    ).style.display =
-      'block';
+    const stressResultCard =
+      document.getElementById(
+        'stressResultCard'
+      );
+
+    if (stressResultCard) {
+
+      stressResultCard.style.display =
+        'block';
+
+    }
 
 
     showNotification(
@@ -1996,10 +2334,31 @@ async function loadStressTests() {
     tbody.innerHTML = '';
 
 
+    if (!tests || tests.length === 0) {
+
+      tbody.innerHTML =
+        '<tr><td colspan="4" class="text-muted">' +
+        'No stress tests have been executed for this case yet.' +
+        '</td></tr>';
+
+      return;
+    }
+
+
     tests.forEach(t => {
 
       const tr =
         document.createElement('tr');
+
+
+      const originalScore =
+        Number(t.originalScore);
+
+      const modifiedScore =
+        Number(t.modifiedScore);
+
+      const scoreDelta =
+        Number(t.scoreDelta);
 
 
       tr.innerHTML = `
@@ -2010,30 +2369,30 @@ async function loadStressTests() {
         </td>
 
         <td>
-          ${t.originalScore.toFixed(1)}
+          ${originalScore.toFixed(1)}
           →
           <span class="font-bold">
-            ${t.modifiedScore.toFixed(1)}
+            ${modifiedScore.toFixed(1)}
           </span>
-          (${t.scoreDelta.toFixed(1)})
+          (${scoreDelta.toFixed(1)})
         </td>
 
         <td>
           <span class="badge ${
-            t.result.includes('HIGH')
+            t.result && t.result.includes('HIGH')
               ? 'badge-green'
               : (
-                t.result.includes('MOD')
+                t.result && t.result.includes('MOD')
                   ? 'badge-amber'
                   : 'badge-red'
               )
           }">
-            ${t.result}
+            ${t.result || 'N/A'}
           </span>
         </td>
 
         <td style="font-size:12px;">
-          ${t.explanation}
+          ${t.explanation || 'N/A'}
         </td>
       `;
 
@@ -2083,6 +2442,15 @@ async function loadReviewData() {
           'PENDING ANALYST REVIEW' +
           '</span>';
 
+      }
+
+      const hist =
+        document.getElementById(
+          'reviewHistoryDetails'
+        );
+
+      if (hist) {
+        hist.innerHTML = '';
       }
 
       return;
@@ -2147,7 +2515,7 @@ async function loadReviewData() {
             font-size:13px;
             color:var(--text-secondary);
           ">
-            ${review.comments}
+            ${review.comments || ''}
           </p>
 
           <p class="mono" style="
@@ -2202,6 +2570,15 @@ async function loadTimeline() {
 
 
     container.innerHTML = '';
+
+
+    if (!events || events.length === 0) {
+
+      container.innerHTML =
+        '<p class="text-muted">No timeline events available for this case yet.</p>';
+
+      return;
+    }
 
 
     events.forEach(ev => {
@@ -2328,6 +2705,17 @@ async function loadAuditTrail() {
     tbody.innerHTML = '';
 
 
+    if (!logs || logs.length === 0) {
+
+      tbody.innerHTML =
+        '<tr><td colspan="5" class="text-muted">' +
+        'No audit activity recorded for this case yet.' +
+        '</td></tr>';
+
+      return;
+    }
+
+
     logs.forEach(l => {
 
       const tr =
@@ -2362,7 +2750,7 @@ async function loadAuditTrail() {
           style="font-size:11px;"
           title="${l.hash}"
         >
-          ${l.hash.substring(0, 16)}...
+          ${l.hash ? l.hash.substring(0, 16) + '...' : 'N/A'}
         </td>
 
       `;
