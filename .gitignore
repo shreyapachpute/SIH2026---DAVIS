@@ -1,0 +1,51 @@
+# Compiled class files
+target/
+*.class
+
+# Log files
+*.log
+logs/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual environments & Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Node & Frontend dependencies
+node_modules/
+dist/
+
+# IDE & Editor files
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Secrets & Local environments
+.env
+.env.local
+*.secret
+
+# Generated test/export files
+cert.pdf
+report.pdf
+test.csv
+test.json

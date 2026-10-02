@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAVIS — Digital Attribution & Verification Intelligence System | SIH 2026</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Cytoscape.js & Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">D</div>
+      <div class="brand-text">
+        <h1>DAVIS <span>INTEL</span></h1>
+        <p>Digital Attribution & Verification Intelligence System | SIH26151</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="case-selector">
+        <label for="caseSelect">Case:</label>
+        <select id="caseSelect"></select>
+      </div>
+      <button id="btnLoadDemo" class="btn btn-cyan">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/></svg>
+        Load Demo Case
+      </button>
+      <span class="badge badge-cyan" id="scopeBadge">Synthetic Controlled Data</span>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <ul class="nav-menu">
+        <li class="nav-item active" data-tab="tab-dashboard">
+          <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+          Dashboard
+        </li>
+        <li class="nav-item" data-tab="tab-investigation">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          Investigation
+        </li>
+        <li class="nav-item" data-tab="tab-graph">
+          <svg viewBox="0 0 24 24"><path d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18s-.41-.06-.57-.18l-7.9-4.44A.991.991 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.16-.12.36-.18.57-.18s.41.06.57.18l7.9 4.44c.32.17.53.5.53.88v9z"/></svg>
+          Relationship Graph
+        </li>
+        <li class="nav-item" data-tab="tab-evidence">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          Evidence Inventory
+        </li>
+        <li class="nav-item" data-tab="tab-analysis">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+          Attribution Analysis
+        </li>
+        <li class="nav-item" data-tab="tab-stress">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          Stress Testing
+        </li>
+        <li class="nav-item" data-tab="tab-review">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          Analyst Review
+        </li>
+        <li class="nav-item" data-tab="tab-timeline">
+          <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+          Timeline
+        </li>
+        <li class="nav-item" data-tab="tab-reports">
+          <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+          Reports & Exports
+        </li>
+        <li class="nav-item" data-tab="tab-audit">
+          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          Audit Trail
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <p><strong>DAVIS v1.0.0</strong></p>
+        <p>Team: JugaaduSloths</p>
+        <p>PS ID: SIH26151</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Tabs -->
+    <main class="main-content">
+      
+      <!-- 1. DASHBOARD -->
+      <section id="tab-dashboard" class="tab-pane active">
+        <div class="page-header">
+          <div class="page-title">
+            <h2 id="dashCaseTitle">Operation Falcon Trace</h2>
+            <p>Case ID: <span id="dashCaseNum" class="mono">DAVIS-DEMO-001</span> | Status: <span id="dashStatus" class="badge badge-green">ACTIVE</span></p>
+          </div>
+          <div>
+            <span id="dashReviewBadge"><span class="badge badge-amber">PENDING REVIEW</span></span>
+          </div>
+        </div>
+
+        <div class="grid-cols-4">
+          <div class="card">
+            <div class="card-header">
+              <h3>Ingested Indicators</h3>
+              <span class="badge badge-cyan">Input</span>
+            </div>
+            <div class="metric-value" id="m-indicators">6</div>
+            <div class="metric-desc">Username, PGP, Wallet, Onion</div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3>Discovered Entities</h3>
+              <span class="badge badge-purple">Entities</span>
+            </div>
+            <div class="metric-value" id="m-entities">10</div>
+            <div class="metric-desc">Correlated personas & nodes</div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3>Evidence Records</h3>
+              <span class="badge badge-green">Forensics</span>
+            </div>
+            <div class="metric-value" id="m-evidence">8</div>
+            <div class="metric-desc">SHA-256 Anchored & Classified</div>
+          </div>
+          <div class="card" id="m-score-card" style="border: 2px solid rgba(0, 229, 255, 0.4);">
+            <div class="card-header">
+              <h3>Attribution Support</h3>
+              <span class="badge badge-cyan">Dynamic</span>
+            </div>
+            <div class="metric-value text-cyan" id="m-score">74.0/100</div>
+            <div class="metric-desc">Net dynamic evidence weight</div>
+          </div>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="card">
+            <div class="card-header">
+              <h3>Investigation Objectives & Scope</h3>
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px;">
+              DAVIS correlates disparate clearnet and darknet signals to construct evidence-backed attribution leads.
+              This system strictly ingests synthetic and controlled demonstration datasets. Automated outputs serve as analytical leads
+              and do NOT independently establish guilt or identity without corroborative discovery.
+            </p>
+            <div style="background:var(--bg-tertiary); padding:10px; border-radius:6px; font-size:12px;">
+              <strong>Legal Alignment:</strong> Bharatiya Sakshya Adhiniyam (BSA) 2023 / BNSS 2023 guidelines on electronic chain-of-custody.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Latest Analyst Review</h3>
+            </div>
+            <div id="reviewHistoryDetails">
+              <p class="text-muted">No review registered yet.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. INVESTIGATION -->
+      <section id="tab-investigation" class="tab-pane">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Controlled Investigation & Simulated Ingestion</h2>
+            <p>Ingest known threat actor indicators and trigger OPSEC-gated synthetic collection</p>
+          </div>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="card">
+            <div class="card-header">
+              <h3>Add Known Indicator</h3>
+            </div>
+            <form id="formIndicator">
+              <div class="form-group">
+                <label for="indType">Indicator Type</label>
+                <select id="indType" class="form-control">
+                  <option value="USERNAME">Username / Alias</option>
+                  <option value="EMAIL">Email Address</option>
+                  <option value="PGP_KEY">PGP Key Fingerprint</option>
+                  <option value="CRYPTO_WALLET">Crypto Wallet Address</option>
+                  <option value="DOMAIN">Domain Name</option>
+                  <option value="ONION_ADDRESS">Tor Onion Service (.onion)</option>
+                  <option value="MESSAGE">Extortion Note / Text Sample</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="indValue">Indicator Value</label>
+                <input type="text" id="indValue" class="form-control mono" placeholder="e.g. NightFalcon or bc1q9davis..." required>
+              </div>
+              <div class="form-group">
+                <label for="indSource">Source / Context</label>
+                <input type="text" id="indSource" class="form-control" placeholder="e.g. Extortion note leak, HKP keyserver" value="Analyst Feed">
+              </div>
+              <button type="submit" class="btn btn-outline" style="width:100%;">Ingest Indicator</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Controlled Collection Engine</h3>
+              <span class="badge badge-cyan">OPSEC-Gated</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">
+              Triggering controlled collection initiates simulated discovery across decentralized markets, PGP keyservers, and blockchain transaction ledgers.
+            </p>
+            <button id="btnStartInvestigation" class="btn btn-cyan" style="width:100%; padding:12px;">
+              START CONTROLLED INVESTIGATION
+            </button>
+            <div id="pipelineLogs" class="pipeline-steps" style="max-height:220px; overflow-y:auto; font-size:11px;">
+              <p class="text-muted">Awaiting pipeline trigger...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+          <div class="card-header">
+            <h3>Ingested Case Indicators</h3>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Indicator Value</th>
+                  <th>Source</th>
+                  <th>Confidence</th>
+                </tr>
+              </thead>
+              <tbody id="indicatorsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. RELATIONSHIP GRAPH -->
+      <section id="tab-graph" class="tab-pane">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Persona & Relationship Graph</h2>
+            <p>Interactive Cytoscape.js correlation network of personas, cryptographic keys, wallets, and infrastructure</p>
+          </div>
+        </div>
+
+        <div class="graph-controls">
+          <button class="btn btn-outline" onclick="GraphController.zoomIn()">Zoom In (+)</button>
+          <button class="btn btn-outline" onclick="GraphController.zoomOut()">Zoom Out (-)</button>
+          <button class="btn btn-outline" onclick="GraphController.fit()">Fit Graph</button>
+          <select id="graphFilter" class="form-control" style="width:180px;" onchange="GraphController.filterByType(this.value)">
+            <option value="ALL">Filter: All Types</option>
+            <option value="PERSONA">Persona</option>
+            <option value="ALIAS">Alias</option>
+            <option value="PGP_KEY">PGP Key</option>
+            <option value="WALLET">Crypto Wallet</option>
+            <option value="DOMAIN">Domain</option>
+            <option value="ONION_SERVICE">Onion Service</option>
+          </select>
+        </div>
+
+        <div style="position:relative;">
+          <div id="cy"></div>
+          <!-- Node Inspector Overlay -->
+          <div id="node-inspector" style="display:none; position:absolute; top:16px; right:16px; width:280px; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:8px; padding:16px; box-shadow:var(--shadow-md); z-index:10;">
+            <h4 id="insp-name" style="color:var(--accent-cyan); font-size:14px; margin-bottom:8px;">Node Details</h4>
+            <p style="font-size:12px; margin-bottom:4px;">Type: <span id="insp-type" class="badge badge-purple"></span></p>
+            <p style="font-size:11px; margin-bottom:4px;">Normalized: <span id="insp-norm" class="mono"></span></p>
+            <p style="font-size:12px; margin-bottom:8px;">Confidence: <span id="insp-conf" class="font-bold"></span></p>
+            <button class="btn btn-outline" style="font-size:11px; width:100%; padding:4px;" onclick="document.getElementById('node-inspector').style.display='none'">Close Inspector</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. EVIDENCE INVENTORY -->
+      <section id="tab-evidence" class="tab-pane">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Evidence Inventory & SHA-256 Integrity</h2>
+            <p>Comprehensive forensic proof items with supporting vs contradictory classifications</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Evidence Content</th>
+                  <th>Source</th>
+                  <th>Classification / Claim</th>
+                  <th>Reliability</th>
+                  <th>SHA-256 Hash</th>
+                </tr>
+              </thead>
+              <tbody id="evidenceTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. ATTRIBUTION ANALYSIS -->
+      <section id="tab-analysis" class="tab-pane">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Attribution Support Analysis</h2>
+            <p>Multi-vector weighted evidence scoring, contradiction penalties, and stylometric linguistics</p>
+          </div>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="card">
+            <div class="card-header">
+              <h3>Dynamic Attribution Support Score</h3>
+              <span class="badge badge-cyan">Normalized 0-100</span>
+            </div>
+            <div style="display:flex; align-items:baseline; gap:12px; margin-bottom:12px;">
+              <span id="analysisScoreVal" style="font-size:42px; font-weight:900; font-family:var(--font-mono); color:var(--accent-cyan);">74.0/100</span>
+              <span class="badge badge-green" id="analysisRobustnessBadge">Evidence-Corroborated Lead</span>
+            </div>
+            <div style="background:var(--bg-tertiary); height:8px; border-radius:4px; overflow:hidden; margin-bottom:16px;">
+              <div id="scoreMeter" style="height:100%; width:74%; background:linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); transition: width 0.4s ease;"></div>
+            </div>
+            <p id="analysisExplanation" style="font-size:12px; color:var(--text-secondary); line-height:1.6;"></p>
+            <p style="font-size:11px; margin-top:8px;"><strong>Primary Dependency:</strong> <span id="primaryDependency" class="mono text-cyan">CRYPTOGRAPHIC (PGP)</span></p>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Vector Strength Radar</h3>
+            </div>
+            <div style="height:240px; position:relative;">
+              <canvas id="attributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-cols-2" style="margin-top:20px;">
+          <div class="card">
+            <div class="card-header">
+              <h3>Score Contribution Breakdown</h3>
+            </div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Dimension</th>
+                    <th>Points</th>
+                    <th>Role</th>
+                  </tr>
+                </thead>
+                <tbody id="breakdownTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Stylometric Analysis & AI-Rewrite Detection</h3>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span>Cosine Similarity: <strong id="stySimPercent" class="mono text-cyan">78.4%</strong></span>
+              <span id="styAiBadge"></span>
+            </div>
+            <p id="styAiExpl" style="font-size:12px; color:var(--text-secondary); line-height:1.6; margin-bottom:12px;"></p>
+            <div style="background:var(--bg-tertiary); padding:10px; border-radius:6px; font-size:11px; color:var(--text-muted);">
+              <strong>Explainability Note:</strong> LLM paraphrasing flattens vocabulary perplexity and sentence length variance. When detected, stylometric weight is safely halved (50%) to prevent false attribution.
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-cols-2" style="margin-top:20px;">
+          <div class="card">
+            <div class="card-header">
+              <h3>Supporting Evidence Claims</h3>
+              <span class="badge badge-green">Corroborating</span>
+            </div>
+            <div id="supportingClaimsList"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Contradictory Evidence Claims</h3>
+              <span class="badge badge-red">Contradictory / Conflict</span>
+            </div>
+            <div id="contradictoryClaimsList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. STRESS TESTING -->
+      <section id="tab-stress" class="tab-pane">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Dependency Stress Test & Robustness</h2>
+            <p>Isolate single evidence dependencies to dynamically test lead stability and detect single-points-of-failure</p>
+          </div>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="card">
+            <div class="card-header">
+              <h3>Execute Dependency Stress Test</h3>
+            </div>
+            <form id="formStressTest">
+              <div class="form-group">
+                <label for="stressDependency">Select Dependency to Remove</label>
+                <select id="stressDependency" class="form-control">
+                  <option value="PGP_KEY">PGP Cryptographic Correlation</option>
+                  <option value="CRYPTO_WALLET">Blockchain Transaction Correlation</option>
+                  <option value="STYLOMETRY">Stylometric & Linguistic Evidence</option>
+                  <option value="ALIAS">Alias / Handle Correlation</option>
+                  <option value="TEMPORAL">Temporal Activity Overlap</option>
+                  <option value="INFRASTRUCTURE">Infrastructure (Domain & Onion)</option>
+                </select>
+              </div>
+              <button type="submit" id="btnRunStress" class="btn btn-danger" style="width:100%; padding:10px;">
+                RUN STRESS TEST
+              </button>
+            </form>
+          </div>
+
+          <div class="card" id="stressResultCard" style="display:none; border:2px solid var(--accent-purple);">
+            <div class="card-header">
+              <h3>Stress Test Recalculation</h3>
+              <span id="stressRobustnessBadge" class="badge"></span>
+            </div>
+            <div style="display:flex; justify-content:space-around; margin:14px 0; text-align:center;">
+              <div>
+                <p style="font-size:11px; color:var(--text-muted);">ORIGINAL SCORE</p>
+                <p id="stressOriginalScore" class="metric-value">74.0/100</p>
+              </div>
+              <div style="display:flex; align-items:center; font-size:24px; color:var(--text-muted);">→</div>
+              <div>
+                <p style="font-size:11px; color:var(--text-muted);">MODIFIED SCORE</p>
+                <p id="stressModifiedScore" class="metric-value text-cyan">50.5/100</p>
+              </div>
+              <div>
+                <p style="font-size:11px; color:var(--text-muted);">DELTA</p>
+                <p id="stressDelta" class="metric-value text-danger">-23.5</p>
+              </div>
+            </div>
+            <p id="stressExplanation" style="font-size:12px; color:var(--text-secondary); margin-bottom:8px; line-height:1.5;"></p>
+            <div style="background:var(--bg-tertiary); padding:8px 12px; border-radius:4px; font-size:11px;">
+              <strong>Pivot Recommendation:</strong> <span id="stressRecommendation"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+          <div class="card-header">
+            <h3>Stress Testing History</h3>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Removed Dependency</th>
+                  <th>Score Shift (Orig → Mod)</th>
+                  <th>Robustness Rating</th>
+                  <th>Explanation & Impact</th>
+                </tr>
+              </thead>
+              <tbody id="stressHistoryTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. ANALYST REVIEW -->
+      <section id="tab-review" class="tab-pane">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Human-in-the-Loop Analyst Review</h2>
+            <p>Mandatory human review, evidence conflict resolution, and case disposition sign-off</p>
+          </div>
+        </div>
+
+        <div class="grid-cols-2">
+          <div class="card">
+            <div class="card-header">
+              <h3>Submit Review & Decision</h3>
+            </div>
+            <form id="formReview">
+              <div class="form-group">
+                <label for="reviewAnalyst">Analyst Identifier / Designation</label>
+                <input type="text" id="reviewAnalyst" class="form-control" value="Analyst Sharma (SIH-CyberSec-Lead)" required>
+              </div>
+              <div class="form-group">
+                <label for="reviewDecision">Investigation Decision</label>
+                <select id="reviewDecision" class="form-control">
+                  <option value="NEEDS_FURTHER_INVESTIGATION">Needs Further Investigation (Temporal Conflict)</option>
+                  <option value="REVIEWED">Reviewed (Analytical Lead Confirmed)</option>
+                  <option value="EVIDENCE_CONFLICT">Evidence Conflict Flagged (Dual Operator Hypothesis)</option>
+                  <option value="APPROVED_LEAD">Approved Investigative Lead for Subpoena / Warrant</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="reviewComments">Analyst Findings & Disposition Notes</label>
+                <textarea id="reviewComments" rows="4" class="form-control" placeholder="Provide detailed reasoning regarding corroborating and contradictory evidence...">Strong cryptographic and financial correlation observed. However, temporal contradiction between NF_27 and NightFalcon live sessions suggests secondary operative or proxy operator. Recommend pivoting to subkey issuer CypherSentinel before concluding attribution lead.</textarea>
+              </div>
+              <button type="submit" class="btn btn-cyan" style="width:100%; padding:10px;">Submit Analyst Review</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Ethical & Legal Responsibility Framework</h3>
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary); line-height:1.6; margin-bottom:12px;">
+              DAVIS enforces mandatory human oversight. Automated scoring and graph resolution outputs provide analytical leads
+              and must NOT be submitted as definitive proof of identity or criminal liability without human analyst verification.
+            </p>
+            <ul style="padding-left:18px; font-size:12px; color:var(--text-muted); line-height:1.6;">
+              <li>Aligns with Bharatiya Sakshya Adhiniyam (BSA) 2023 Section 63 on digital evidence integrity.</li>
+              <li>Supports Bharatiya Nagarik Suraksha Sanhita (BNSS) 2023 procedural chain-of-custody standards.</li>
+              <li>Immutable SHA-256 hash chaining records all review actions to guarantee non-repudiation.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. TIMELINE -->
+      <section id="tab-timeline" class="tab-pane">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Chronological Investigation Timeline</h2>
+            <p>Sequenced timeline of indicator discovery, collection events, evidence linking, and analyst reviews</p>
+          </div>
+        </div>
+
+        <div id="timelineContainer" class="timeline"></div>
+      </section>
+
+      <!-- 9. REPORTS & EXPORTS -->
+      <section id="tab-reports" class="tab-pane">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Investigation Reports & Evidence Exports</h2>
+            <p>Generate formal PDF reports, legal evidence integrity certificates, CSV matrices, and structured JSON packages</p>
+          </div>
+        </div>
+
+        <div class="grid-cols-4">
+          <div class="card" style="text-align:center;">
+            <h3 style="font-size:14px; margin-bottom:10px;">Investigation Report PDF</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Complete forensic report including evidence tables, score breakdown, and legal disclaimer.</p>
+            <button id="btnExportPdf" class="btn btn-primary" style="width:100%;">Download PDF Report</button>
+          </div>
+          <div class="card" style="text-align:center;">
+            <h3 style="font-size:14px; margin-bottom:10px;">Integrity Certificate PDF</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Formal electronic evidence chain-of-custody certificate with SHA-256 seal.</p>
+            <button id="btnExportCert" class="btn btn-cyan" style="width:100%;">Download Certificate</button>
+          </div>
+          <div class="card" style="text-align:center;">
+            <h3 style="font-size:14px; margin-bottom:10px;">CSV Matrix Export</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Export raw entities, relationships, evidence, and hashes for spreadsheet analysis.</p>
+            <button id="btnExportCsv" class="btn btn-outline" style="width:100%;">Download CSV</button>
+          </div>
+          <div class="card" style="text-align:center;">
+            <h3 style="font-size:14px; margin-bottom:10px;">Full JSON Package</h3>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Export complete case archive with master cryptographic seal.</p>
+            <button id="btnExportJson" class="btn btn-outline" style="width:100%;">Download JSON</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+          <div class="card-header">
+            <h3>SHA-256 Tamper Verification Engine</h3>
+          </div>
+          <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">
+            Verify the cryptographic integrity of any digital artifact or exported text package against its stored SHA-256 digest.
+          </p>
+          <form id="formVerify" class="grid-cols-2">
+            <div>
+              <label style="font-size:12px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Original Data / Text</label>
+              <textarea id="verifyData" rows="3" class="form-control mono" placeholder="Enter content to verify..." required></textarea>
+            </div>
+            <div>
+              <label style="font-size:12px; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Expected SHA-256 Digest</label>
+              <input type="text" id="verifyHash" class="form-control mono" placeholder="Enter SHA-256 hash..." required>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <button type="submit" class="btn btn-outline">Verify Cryptographic Integrity</button>
+                <div id="verifyResult"></div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- 10. AUDIT TRAIL -->
+      <section id="tab-audit" class="tab-pane">
+        <div class="page-header">
+          <div class="page-title">
+            <h2>Immutable Cryptographic Audit Trail</h2>
+            <p>Tamper-evident log of all case creation, indicator ingestion, collection, analysis, and export actions</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Action</th>
+                  <th>Actor</th>
+                  <th>Details</th>
+                  <th>Audit SHA-256</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
