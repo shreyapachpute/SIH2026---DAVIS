@@ -6,7 +6,7 @@
 
 > An investigation-support platform for correlating digital indicators, analysing relationships, evaluating attribution evidence, and generating integrity-preserved investigation reports.
 
-### 🚀 Live Prototype
+### Live Prototype
 
 **Prototype:**
 https://davis-production-3823.up.railway.app
@@ -17,7 +17,7 @@ https://davis-production-3823.up.railway.app
 
 ---
 
-## 📌 Overview
+## Overview
 
 Modern cyber investigations often involve digital identities and traces scattered across multiple sources, including usernames, email identities, PGP keys, cryptocurrency wallets, onion services, domains, messages, and public-web profiles.
 
@@ -41,7 +41,7 @@ DAVIS is designed as an **analytical decision-support system**, not an autonomou
 
 ---
 
-# 🎯 Problem Statement
+# Problem Statement
 
 Cyber investigations frequently encounter fragmented digital traces distributed across different platforms and time periods.
 
@@ -67,7 +67,7 @@ The challenge is not only collecting these indicators, but determining whether a
 
 ---
 
-# 💡 Proposed Solution
+# Proposed Solution
 
 DAVIS provides a unified investigation workflow:
 
@@ -99,7 +99,7 @@ The system combines multiple evidence dimensions rather than relying on a single
 
 ---
 
-# ⭐ Key Features
+# Key Features
 
 ## 1. Indicator Ingestion
 
